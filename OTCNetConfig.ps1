@@ -60,7 +60,7 @@ function IpSetup()
     $confirmation = Read-Host -Prompt " > Do you want to apply these settings? [Y/n]"
 
     #If input is invalid, skip network setup process#
-    if ($class -eq "" -or [int]$class -notin 1..255 -or $computer -eq "" -or [int]$computer -notin 1..255)
+    if ($class -eq "" -or [int]$class -notin 0..255 -or $computer -eq "" -or [int]$computer -notin 1..255)
     {
         Write-Host " Invalid class number..." -ForegroundColor Yellow
         Write-Host ""
@@ -246,16 +246,18 @@ for ($i = 1; ($i * $exit) -lt 1; $i++)
                 #If input is not blank continue scanning#
                 if ($class -ne "")
                 {
+
                     Write-Host ""
                     Write-Host " SCANNING LOCAL NETWORK....."
                     Write-Host ""
-            
+
                     #Recursively search for hosts on the local network#
-                    1..254 | ForEach-Object {
+                    1..5 | ForEach-Object {
                         $IPAddress = "$subIp.$_"
-                        $j+= 0.393700787
+                        $j+= 100/5
                         $result = Test-Connection -ComputerName $IPAddress -Count 1 -ErrorAction SilentlyContinue
-                        Write-Progress -Activity "Search in Progress" -Status ("{0:F1} % Complete. Currently scanning $IPAddress" -f $j) -PercentComplete $j
+                        #Display progress bar#
+                        Write-Progress -Activity "Search in Progress" -Status ("$j % Complete. Currently scanning $IPAddress") -PercentComplete $j
 
                         #If host is found, then display information#
                         if ($result)
@@ -275,6 +277,8 @@ for ($i = 1; ($i * $exit) -lt 1; $i++)
                             $foundHosts += 1
                         }
                     }
+                    #Reset progress bar#
+                    Write-Progress -Activity "Search in Progress" -Completed $true
                 }
                 Read-Host -Prompt "$foundHosts hosts found. Press RETURN to go back to Menu"
             }
@@ -282,6 +286,7 @@ for ($i = 1; ($i * $exit) -lt 1; $i++)
           ###DONT DO IT !!!!!!!!!!!!!111111110110101010L0L0LOLOL###
             elseif($selection -eq "5")
             {
+
                 #Display a fake installation process#
                 Write-Host ""
                 Write-Host 'Initializing backdoor installation process...' -ForegroundColor Yellow
@@ -301,9 +306,10 @@ for ($i = 1; ($i * $exit) -lt 1; $i++)
                 Write-Host '[+]' -ForegroundColor Green -NoNewline; Write-Host ' Injecting payload into system processes...'
 
                 #Display fake progress bar#
-                for($i = 0; $i -lt 100; $i += 4.5)
+                Write-Progress -Activity "Installing Rootkit" -Status ("0 % Complete") -PercentComplete 0 -Completed $true
+                for($x = 0; $x -lt 100; $x += 4.5)
                 {
-                    Write-Progress -Activity "Installing Rootkit" -Status ("$i% Complete" -f $i) -PercentComplete $i
+                    Write-Progress -Activity "Installing Rootkit" -Status ("$x % Complete") -PercentComplete $x
                     Start-Sleep -Milliseconds 80
                 }
 
