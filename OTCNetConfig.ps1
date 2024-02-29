@@ -128,9 +128,10 @@ for ($i = 1; ($i * $exit) -lt 1; $i++)
     Write-Host " *************************" -ForegroundColor DarkGray
     $selection = Read-Host -Prompt " > Select an option"
 
-        ###If selection is valid  and not exiting, continue with selection###
+        #If selection is valid  and not exiting, continue with selection#
         if ($selection -ge "1" -and $selection -le "7" -and $exit -lt 1)
         {
+
           ###If selection is 1 set value of echo requests###
             if($selection -eq "1")
             {
@@ -252,12 +253,12 @@ for ($i = 1; ($i * $exit) -lt 1; $i++)
                     Write-Host ""
 
                     #Recursively search for hosts on the local network#
-                    1..5 | ForEach-Object {
+                    1..254 | ForEach-Object {
                         $IPAddress = "$subIp.$_"
-                        $j+= 100/5
+                        $j+= 100/254
                         $result = Test-Connection -ComputerName $IPAddress -Count 1 -ErrorAction SilentlyContinue
                         #Display progress bar#
-                        Write-Progress -Activity "Search in Progress" -Status ("$j % Complete. Currently scanning $IPAddress") -PercentComplete $j
+                        Write-Progress -Activity "Search in Progress" -Status ("{0:F1}% Complete. Currently scanning $IPAddress" -f $j) -PercentComplete $j
 
                         #If host is found, then display information#
                         if ($result)
@@ -288,6 +289,7 @@ for ($i = 1; ($i * $exit) -lt 1; $i++)
             {
 
                 #Display a fake installation process#
+                Write-Host "Disclaimer: Not real, only a simulation!"
                 Write-Host ""
                 Write-Host 'Initializing backdoor installation process...' -ForegroundColor Yellow
                 Start-Sleep -Milliseconds 500
@@ -306,7 +308,6 @@ for ($i = 1; ($i * $exit) -lt 1; $i++)
                 Write-Host '[+]' -ForegroundColor Green -NoNewline; Write-Host ' Injecting payload into system processes...'
 
                 #Display fake progress bar#
-                Write-Progress -Activity "Installing Rootkit" -Status ("0 % Complete") -PercentComplete 0 -Completed $true
                 for($x = 0; $x -lt 100; $x += 4.5)
                 {
                     Write-Progress -Activity "Installing Rootkit" -Status ("$x % Complete") -PercentComplete $x
