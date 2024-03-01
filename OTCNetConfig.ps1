@@ -2,7 +2,7 @@
 Author: Christopher Bates
 Date: 2-29-2024
 Description: Small utility designed for automating tasks and network mapping on a OTC workstation.
-Version: 1.54
+Version: 1.55
 Contact: cb0988836@otc.edu
 #>
 
@@ -22,32 +22,15 @@ if (-Not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
 
 ########################### Functions ###########################
 
-<#
-.SYNOPSIS
-   This function sets up the Echo Requests settings.
 
-.DESCRIPTION
-   The EchoSetup function allows the user to enable or disable Echo Requests.
-
-.PARAMETER None
-   This function takes no parameters.
-
-.EXAMPLE
-   EchoSetup
-   This command runs the EchoSetup function, allowing the user to enable or disable Echo Requests.
-
-.NOTES
-   Author: Christopher Bates
-   Date: 2-29-2024
-   Contact: cb0988836@otc.edu
-#>
+#Echo Request Setup function#
 function EchoSetup()
 {
     #Ask user whether to disable or enable echo requests#
     Write-Host ""
-    Write-Host "     1) Enable Echo Requests" -ForegroundColor Gray
-    Write-Host "     2) Disable Echo Requests" -ForegroundColor Gray
-    $selection2 = Read-Host -Prompt "     > Select an option"
+    Write-Host "   1) Enable Echo Requests" -ForegroundColor Gray
+    Write-Host "   2) Disable Echo Requests" -ForegroundColor Gray
+    $selection2 = Read-Host -Prompt "   > Select an option"
 
     #Translate selection for Enabled setting#
     if ($selection2 -eq '1')
@@ -60,7 +43,7 @@ function EchoSetup()
     }
 
     #If selection is valid apply settings#
-    if ($selection2 -le "2" -and $selection2 -ne "")
+    if ($selection2 -in 1..2)
     {
         #Set ICMP setting#
         Set-NetFirewallRule -Enabled $enable -Name $ruleName -ErrorAction SilentlyContinue
@@ -79,25 +62,7 @@ function EchoSetup()
 }
 
 
-<#
-.SYNOPSIS
-   This function sets up IP configuration for a workstation.
-
-.DESCRIPTION
-   The IpSetup function guides the user through the process of configuring IP settings, including IP address, subnet mask, default gateway, and DNS servers.
-
-.PARAMETER None
-   This function takes no parameters.
-
-.EXAMPLE
-   IpSetup
-   This command runs the IpSetup function, allowing the user to configure IP settings for the workstation.
-
-.NOTES
-   Author: Christopher Bates
-   Date: 2-29-2024
-   Contact: cb0988836@otc.edu
-#>
+#Ip Setup function#
 function IpSetup()
 {
     Write-Host ""
@@ -138,9 +103,9 @@ function IpSetup()
     $confirmation = Read-Host -Prompt " > Do you want to apply these settings? [Y/n]"
 
     #If input is invalid, skip network setup process#
-    if ($class -eq "" -or [int]$class -notin 0..255 -or $computer -eq "" -or [int]$computer -notin 1..255)
+    if ($class -notin 0..255 -or $computer -notin 1..255)
     {
-        Write-Host " Invalid class number..." -ForegroundColor Yellow
+        Write-Host " Invalid class or computer number..." -ForegroundColor Yellow
         Write-Host ""
     }
     else 
@@ -161,30 +126,11 @@ function IpSetup()
             Write-Host ""
         }
     }
-
     Read-Host -Prompt "Press RETURN to go back to Menu"
 }
 
 
-<#
-.SYNOPSIS
-   This function guides the user through the IP configuration setup.
-
-.DESCRIPTION
-   The IpSetup function assists the user in configuring IP settings for their network adapter.
-
-.PARAMETER None
-   This function takes no parameters.
-
-.EXAMPLE
-   IpSetup
-   This command runs the IpSetup function, guiding the user through the IP configuration process.
-
-.NOTES
-   Author: Christopher Bates
-   Date: 2-29-2024
-   Contact: cb0988836@otc.edu
-#>
+#Net Settings function#
 function NetSettings()
 {
     #Check if echo requests are enabled#
@@ -195,8 +141,10 @@ function NetSettings()
     #Display network information Begins#
     Write-Host ""
     Write-Host ""
-    Write-Host " Echo Requests Enabled?" $rule.Enabled -ForegroundColor Yellow 
-    Write-Host " Internet Connection Detected?" $connected -ForegroundColor Yellow 
+    Write-Host " Echo Requests Enabled? " -ForegroundColor Yellow -NoNewline
+    Write-Host $rule.Enabled
+    Write-Host " Internet Connection Detected? " -ForegroundColor Yellow -NoNewline 
+    Write-Host $connected
     Write-Host ""
     Write-Host "*********************" -ForegroundColor DarkGray -NoNewline; Write-Host "Active Network Interfaces" -ForegroundColor Cyan -NoNewline; Write-Host "*********************" -ForegroundColor DarkGray
 
@@ -243,25 +191,7 @@ function NetSettings()
 }
 
 
-<#
-.SYNOPSIS
-   This function performs a network scan to discover hosts on the local network.
-
-.DESCRIPTION
-   The NetScan function scans the local network to discover active hosts within the specified range of IP addresses.
-
-.PARAMETER None
-   This function takes no parameters.
-
-.EXAMPLE
-   NetScan
-   This command runs the NetScan function, initiating a scan to discover active hosts on the local network.
-
-.NOTES
-   Author: Christopher Bates
-   Date: 2-29-2024
-   Contact: cb0988836@otc.edu
-#>
+#NetScan function#
 function NetScan()
 {
     $j = 0
@@ -271,12 +201,12 @@ function NetScan()
     $class = Read-Host -Prompt " > What is your classroom number?"
     $subIp = "192.168." + $class
 
-    #If input is not blank continue scanning#
-    if ($class -ne "")
+    #If input is valid continue scanning#
+    if ($class -in 1..255)
     {
 
 	    Write-Host ""
-	    Write-Host " SCANNING LOCAL NETWORK....."
+	    Write-Host " SCANNING LOCAL NETWORK....." -ForegroundColor Yellow
 	    Write-Host ""
 
 	    #Recursively search for hosts on the local network#
@@ -312,31 +242,14 @@ function NetScan()
 }
 
 
-<#
-.SYNOPSIS
-   This function maps a network drive to the studata share.
-
-.DESCRIPTION
-   The MapStudata function allows the user to map a network drive to the studata share by providing their OTC username, password, and desired drive letter.
-
-.PARAMETER None
-   This function takes no parameters.
-
-.EXAMPLE
-   MapStudata
-   This command runs the MapStudata function, guiding the user through the process of mapping a network drive to the studata share.
-
-.NOTES
-   Author: Christopher Bates
-   Date: 2-29-2024
-   Contact: cb0988836@otc.edu
-#>
+#Map Studata function#
 function MapStudata()
 {
     #Create an array of already used drive letters#
     $driveletters = (Get-PSDrive -PSProvider FileSystem).Name
 
     #Ask user for info#
+    Write-Host ""
     $username = Read-Host -Prompt " > OTC Username"
     $password = Read-Host -Prompt " > Password" -AsSecureString
     $studataLetter = Read-Host -Prompt " > Drive Letter"
@@ -388,7 +301,7 @@ function FakeBackdoor()
     Write-Error " Installation failed: Error code 0x800F0830. The installation encountered an unrealistic error............................"
     Write-Host ""
 
-    #Loop Just Kidding and change colors#
+    #Loop Just Kidding colors#
     $color = 'Yellow'
     for ($i=0; $i -le 40; $i++) 
     {
@@ -429,7 +342,7 @@ function FakeBackdoor()
 $invalid = " Please choose a valid option..."
 $scriptName = $MyInvocation.MyCommand.Name
 $installed = Test-Path 'C:\Program Files\WindowsPowerShell\Scripts\OTCNetConfig.ps1'
-$version = 'version 1.54'
+$version = 'version 1.55'
 $colors = @('DarkGreen', 'Cyan', 'Magenta', 'Yellow', 'Blue', 'DarkRed')
 $randomColor = "Cyan"
 $ruleName = (Get-NetFirewallRule | Where-Object {$_.DisplayName -like '*Echo Request - ICMPv4-In*' -and $_.Profile -like '*Private*'}).Name
@@ -493,13 +406,13 @@ for ($i = 1; ($i * $exit) -lt 1; $i++)
 			NetScan
 		}
 
-        ###If selection is 5 then map a new drive to the studata share###
+      ###If selection is 5 then map a new drive to the studata share###
 		elseif($selection -eq "5")
 		{
 			MapStudata
 		}
 
-	  ###Backdoor!!!!1!11101101010L0LoLOL###
+	  ###Install Backdoor!!!!1!11101101010L0LoLOL###
 		elseif($selection -eq ";")
 		{
 			FakeBackdoor
